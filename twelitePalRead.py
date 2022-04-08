@@ -13,6 +13,7 @@
 from serial import *
 from sys import stdout, stdin, stderr, exit
 import threading
+import datetime
 
 # 大域変数
 serialPort = None	# シリアルポート
@@ -34,7 +35,9 @@ def printDataPacket(l):
 # 受信メッセージの表示
 def printPayload(l):
 
-	print("---DataNo 0x%04x" % (l[5] << 8 | l[6]))
+	dt_now = datetime.datetime.now()
+
+	print("---DataNo 0x%04x" % (l[5] << 8 | l[6]) , dt_now.strftime('%H:%M'))
 	print(" Device ID : %02x " % l[11])
 	print(" LQI       : %d / %.2f [dbm]" % (l[4],(7 * l[4] - 1970) / 20.))
 	print(" ADC       : %d mV" % (l[19] << 8 | l[20]))
