@@ -40,11 +40,11 @@ def printPayload(l):
 	print("---DataNo 0x%04x" % (l[5] << 8 | l[6]) , dt_now.strftime('%H:%M'))
 	print(" Device ID : %02x " % l[11])
 	print(" LQI       : %d / %.2f [dbm]" % (l[4],(7 * l[4] - 1970) / 20.))
-	print(" ADC       : %d mV" % (l[19] << 8 | l[20]))
-	print(" ADC1      : %d mV" % (l[25] << 8 | l[26]))
-	print(" Temp      : %.2f C" % ((l[31] << 8 | l[32]) / 100.))
-	print(" mide      : %.2f %%" % ((l[37] << 8 | l[38]) / 100.))
-	print(" lux       : %d" % (l[43] << 24 | l[44] << 16 | l[45] << 8 | l[46]))
+	print(" ADC       : %dmV" % (l[19] << 8 | l[20]))
+	print(" ADC1      : %dmV" % (l[25] << 8 | l[26]))
+	print(" TemperaturE : %.2fC" % ((l[31] << 8 | l[32]) / 100.) , end=" /")
+	print(" Humidity : %.2f%%" % ((l[37] << 8 | l[38]) / 100.) , end=" /")
+	print(" Illuminance : %dlux" % (l[43] << 24 | l[44] << 16 | l[45] << 8 | l[46]))
 
 	return True
 
