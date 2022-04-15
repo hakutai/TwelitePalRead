@@ -57,7 +57,7 @@ def printPayload(l):
 		sensorValue = None
 		valueUnit   = sensor['unit']
 
-		if sensorID == '00':i				# 磁気
+		if sensorID == '00':				# 磁気
 			sensorValue = l[index + 4]
 		elif sensorID == '01':				# 温度
 			sensorValue = (l[index + 4] << 8 | l[index + 5]) / 100
