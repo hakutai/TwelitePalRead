@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # coding: utf8
 
 ##########################################################################
@@ -15,6 +15,7 @@ from serial import *
 from sys import stdout, stdin, stderr, exit
 import threading
 import datetime
+import ambient			## ambientアクセス用のライブラリ
 
 # 大域変数
 serialPort = None	# シリアルポート
@@ -31,12 +32,17 @@ sensorList = { 	'00' : { 'name':'磁気',    'unit':'',   'datatype':'00' },
 				'05' : { 'name':'イベント','unit':'',   'datatype':'12' },
 				'30' : { 'name':'ADC',     'unit':'mV', 'datatype':'11' }}
 
-#
+# for ambidata
+AmbiChanel		= Ambichanel			## チャネルIDを指定
+AmbiWriteKey    = "AmbiWriteKey"		## チャネルのライトキーを指定
+						## 以下４行は書き込むデータ認識符
+AmbiDataTempID  = "d1"
+AmbiDataHumiID  = "d2"
+AmbiDataBritID  = "d3"
+AmbiDataBatID   = "d4"
 
-# データパケットの表示
-def printDataPacket(l):
-
-	return True
+						## ambientハンドルの初期化
+ambidataHandle = ambient.Ambient(AmbiChanel,AmbiWriteKey)
 
 # 受信メッセージの表示
 def printPayload(l):
@@ -61,11 +67,14 @@ def printPayload(l):
 			sensorValue = l[index + 4]
 		elif sensorID == '01':				# 温度
 			sensorValue = (l[index + 4] << 8 | l[index + 5]) / 100
+			tempData    = sensorValue
 		elif sensorID == '02':				# 湿度
 			sensorValue = (l[index + 4] << 8 | l[index + 5]) / 100
+			humiData    = sensorValue
 		elif sensorID == '03':				# 照度
 			sensorValue = l[index + 4] << 24 | l[index + 5] << 16 \
 						| l[index + 6] <<  8 | l[index + 7]
+			britData    = sensorValue
 		elif sensorID == '04':				# 加速度
 			sensorValue = "X:"+str(l[index + 4]<<8 | l[index + 5])+"mg,"  \
 						+ "Y:"+str(l[index + 6]<<8 | l[index + 7])+"mg," 
@@ -76,6 +85,7 @@ def printPayload(l):
 			sensorValue = l[index + 4] << 8 | l[index + 5]
 			if l[index + 2] == 8:
 				sensorName = '電源電圧'
+				batData    = sensorValue
 			elif l[index + 2] == 1:
 				sensorName = 'ADC1'
 
@@ -86,6 +96,11 @@ def printPayload(l):
 		index += 4 + l[index + 3]
 
 	print(" ")
+#				ambientへ送信
+	r = ambidataHandle.send({ AmbiDataTempID : tempData,
+					AmbiDataHumiID : humiData,
+					AmbiDataBritID : britData,
+					AmbiDataBatID  : batData } )
 
 
 	return True
