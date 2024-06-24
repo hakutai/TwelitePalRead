@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # coding: utf8
 
 ##########################################################################
@@ -6,6 +6,10 @@
 # TWELITE PAL からデータを読み込み、表示
 #
 # usage : twelitePalRead DEVICE-NAME
+#
+# 2024/06/24	ambientへ送信間隔を５分（５回に１回）へ変更
+#					本来はpalの設定で５分にするのだが、設定変更は外部から
+#					不可の為、プログラムで対応した
 #
 #
 #
@@ -15,7 +19,7 @@ from serial import *
 from sys import stdout, stdin, stderr, exit
 import threading
 import datetime
-import ambient			## ambientアクセス用のライブラリ
+import ambient
 
 # 大域変数
 serialPort = None	# シリアルポート
@@ -33,19 +37,28 @@ sensorList = { 	'00' : { 'name':'磁気',    'unit':'',   'datatype':'00' },
 				'30' : { 'name':'ADC',     'unit':'mV', 'datatype':'11' }}
 
 # for ambidata
-AmbiChanel		= Ambichanel			## チャネルIDを指定
-AmbiWriteKey    = "AmbiWriteKey"		## チャネルのライトキーを指定
-						## 以下４行は書き込むデータ認識符
+AmbiChanel		= 79365
+AmbiWriteKey    = "6234a8e3e6c7bd57"
 AmbiDataTempID  = "d1"
 AmbiDataHumiID  = "d2"
 AmbiDataBritID  = "d3"
 AmbiDataBatID   = "d4"
 
-						## ambientハンドルの初期化
+SendInterval:  int = 5			## 間隔
+kSendInterval: int = 0			## カウンタ
+
 ambidataHandle = ambient.Ambient(AmbiChanel,AmbiWriteKey)
+
+#
+
+# データパケットの表示
+def printDataPacket(l):
+
+	return True
 
 # 受信メッセージの表示
 def printPayload(l):
+	global kSendInterval
 
 	dt_now = datetime.datetime.now()
 
@@ -96,12 +109,18 @@ def printPayload(l):
 		index += 4 + l[index + 3]
 
 	print(" ")
-#				ambientへ送信
-	r = ambidataHandle.send({ AmbiDataTempID : tempData,
-					AmbiDataHumiID : humiData,
-					AmbiDataBritID : britData,
-					AmbiDataBatID  : batData } )
+###	send ambient
 
+
+	if kSendInterval == 0:
+		print(" SEND !! ")
+		r = ambidataHandle.send({ AmbiDataTempID : tempData, 
+				AmbiDataHumiID : humiData, 
+				AmbiDataBritID : britData, 
+				AmbiDataBatID  : batData } )
+		kSendInterval = SendInterval
+
+	kSendInterval -= 1
 
 	return True
 
