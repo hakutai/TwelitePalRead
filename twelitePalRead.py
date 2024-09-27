@@ -37,8 +37,8 @@ sensorList = { 	'00' : { 'name':'磁気',    'unit':'',   'datatype':'00' },
 				'30' : { 'name':'ADC',     'unit':'mV', 'datatype':'11' }}
 
 # for ambidata
-AmbiChanel		= 79365
-AmbiWriteKey    = "6234a8e3e6c7bd57"
+AmbiChanel		= ??????
+AmbiWriteKey    = "??????????"
 AmbiDataTempID  = "d1"
 AmbiDataHumiID  = "d2"
 AmbiDataBritID  = "d3"
